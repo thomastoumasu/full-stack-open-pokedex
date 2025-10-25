@@ -75,7 +75,7 @@ export default defineConfig({
 
   /* Run your local dev server before starting the tests */
   webServer: {
-    // command: "npm run build && npm run start-prod",
+    /* Make sure the right build is in dist folder */
     command: "npm run start-prod",
     url: "http://localhost:5000",
     timeout: 10 * 1000,
