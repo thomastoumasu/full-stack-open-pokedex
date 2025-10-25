@@ -14,15 +14,23 @@ jobs:
         with:
           node-version: '20'
       - name: Install dependencies
-        run: npm install
+        run: npm ci
       - name: Check style
         run: npm run eslint
-      - name: build
-        run: npm run build
-      - name: frontend tests
+      - name: Run frontend tests
         run: npm run test
-      - name: e2e tests
-        run: npm run test:e2e
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+      - name: Build
+        run: npm run build
+      - name: Run Playwright tests
+        run: npx playwright test
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
       - name: Trigger deployment
         run: curl https://api.render.com/deploy/srv-${{ secrets.RENDER_SERVICE_ID }}?key=${{ secrets.RENDER_API_KEY }}
 
