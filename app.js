@@ -7,18 +7,18 @@ const PORT = process.env.PORT || 5000;
 app.use(express.static("dist"));
 
 app.get("/version", (req, res) => {
-  res.send("1.2"); // change this string to ensure a new version deployed
+  res.send("1.3"); // change this string to ensure a new version deployed
 });
 
-// app.get("/health", (req, res) => {
-//   res.send("ok"); // health check ensuring that the app deployed (for example in render) is in a functional state.
+app.get("/health", (req, res) => {
+  res.send("ok"); // health check ensuring that the app deployed (for example in render) is in a functional state.
+});
+
+// app.get("/health", (req, res) => { // simulate a broken deployment
+//   // eslint-disable-next-line no-constant-condition
+//   if (true) throw "error...  ";
+//   res.send("ok");
 // });
-
-app.get("/health", (req, res) => { // simulate a broken deployment
-  // eslint-disable-next-line no-constant-condition
-  if (true) throw "error...  ";
-  res.send("ok");
-});
 
 app.listen(PORT, () => {
   // eslint-disable-next-line no-console
