@@ -12,7 +12,7 @@ jobs:
   simple_deployment_pipeline:
     runs-on: ubuntu-latest
     outputs:
-      run-id: ${{ steps.failure-prs.outputs.RUN_ID }}
+      run-id: ${{ steps.failure.outputs.RUN_ID }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
