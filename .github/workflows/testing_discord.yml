@@ -40,7 +40,7 @@ jobs:
           first_error_path=$(echo "$annotations" | jq '.path')
           first_error_message=$(echo "$annotations" | jq '.message')
           last_commit_url=$(curl $(curl $(curl https://api.github.com/repos/thomastoumasu/full-stack-open-pokedex/check-runs/${{ env.RUN_ID }} | jq -r '.pull_requests[0].url') | jq -r '.commits_url') | jq -r '.[-1].url')
-          echo "commit $last_commit_sha broke the build: $first_error_message in $first_error_path"
+          echo "commit $last_commit_url broke the build: $first_error_message in $first_error_path"
       - name: dispatch success message
         if: ${{ env.RUN_ID == '' }}
         run: echo "a new version deployed"
