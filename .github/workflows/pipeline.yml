@@ -32,7 +32,7 @@ jobs:
           JOBSUCCESS: ${{ toJson(job) }}
         run: echo "job success $JOBSUCCESS"
       - name: Test Failure
-        # if: ${{ failure() }}
+        if: ${{ failure() }}
         # run: |
         #   {
         #     echo 'JSON_RESPONSE<<EOF'
