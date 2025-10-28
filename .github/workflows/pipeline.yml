@@ -44,11 +44,11 @@ jobs:
         #   echo "response_output=$some_response" >> $GITHUB_OUTPUT
         # id: some-request
         run: |
-          some_response=$(curl -X GET https://api.github.com/repos/thomastoumasu/full-stack-open-pokedex/check-runs/${{ job.check_run_id }}/annotations | python -c "import sys,json; print(json.load(sys.stdin)[-1]['message'])")
-          echo "response_output=$some_response" >> $GITHUB_OUTPUT
+          # some_response=$(curl -X GET https://api.github.com/repos/thomastoumasu/full-stack-open-pokedex/check-runs/${{ job.check_run_id }}/annotations | python -c "import sys,json; print(json.load(sys.stdin)[-1]['message'])")
+          # echo "response_output=$some_response" >> $GITHUB_OUTPUT
           annotations=$(curl -X GET https://api.github.com/repos/thomastoumasu/full-stack-open-pokedex/check-runs/${{ job.check_run_id }}/annotations | python -c "import sys,json; print(json.load(sys.stdin)[-1]['message'])")
           echo "anno=$annotations" >> $GITHUB_ENV
-          id: some-request
+        id: some-request
       - name: Test Failure 2
         if: ${{ always() }}
         run: echo "${{ env.anno }}"
