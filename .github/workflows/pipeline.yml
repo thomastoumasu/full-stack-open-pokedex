@@ -19,6 +19,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
@@ -47,7 +49,7 @@ jobs:
         # some_response=$(curl -X GET https://api.github.com/repos/thomastoumasu/full-stack-open-pokedex/check-runs/${{ job.check_run_id }}/annotations | python -c "import sys,json; print(json.load(sys.stdin)[-1]['message'])")
         # echo "response_output=$some_response" >> $GITHUB_OUTPUT
         run: |
-          annotations=$(curl -X GET https://api.github.com/repos/thomastoumasu/full-stack-open-pokedex/check-runs/${{ job.check_run_id }}/annotations | python -c "import sys,json; print(json.load(sys.stdin)[-1]['message'])")
+          annotations=$(curl -X GET https://api.github.com/repos/thomastoumasu/full-stack-open-pokedex/check-runs/${{ job.check_run_id }}/annotations | python -c "import sys,json; print(sys.stdin); print(json.load(sys.stdin)[-1]['message'])")
           echo "anno=$annotations" >> $GITHUB_ENV
         id: some-request
       - name: Test Failure 2
