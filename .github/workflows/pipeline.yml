@@ -36,11 +36,14 @@ jobs:
         if: ${{ failure() }}
         id: testfailure
         run: |
-          {
-              echo "info=<<EOF"
-              curl https://api.github.com/repos/thomastoumasu/full-stack-open-pokedex/check-runs/${{ job.check_run_id }}/annotations
-              echo "EOF"
-          } >> "$GITHUB_OUTPUT"
+          annotations=$(curl "${https://api.github.com/repos/thomastoumasu/full-stack-open-pokedex/check-runs/${{ job.check_run_id }}/annotations}")
+          echo info=annotations >> $GITHUB_OUTPUT
+        # run: |
+        #   {
+        #       echo "info=<<EOF"
+        #       curl https://api.github.com/repos/thomastoumasu/full-stack-open-pokedex/check-runs/${{ job.check_run_id }}/annotations
+        #       echo "EOF"
+        #   } >> "$GITHUB_OUTPUT"
         # run: echo "job_run_id=job.check_run_id" >> "$GITHUB_OUTPUT"
       # - name: Run frontend tests
       #   run: npm run test
