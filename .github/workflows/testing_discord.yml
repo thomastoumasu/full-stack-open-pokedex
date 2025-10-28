@@ -24,10 +24,14 @@ jobs:
         if: ${{ failure() }}
         id: failure
         run: |
-          echo "runid=${{ job.check_run_id }}" >> $GITHUB_OUTPUT
-          echo "global_runid=$job.check_run_id" >> $GITHUB_ENV
-          echo "$runid"
-          echo "$global_runid"
+          error_path=$(curl https://api.github.com/repos/thomastoumasu/full-stack-open-pokedex/check-runs/53849423899/annotations | jq '.[-1].path')
+          error_message=$(curl https://api.github.com/repos/thomastoumasu/full-stack-open-pokedex/check-runs/53849423899/annotations | jq '.[-1].message')
+          echo "error_path=$error_path" >> $GITHUB_OUTPUT
+          echo "error_message=$error_message" >> $GITHUB_OUTPUT
+          echo "global_error_path=$error_path" >> $GITHUB_ENV
+          echo "global_error_message=$error_message" >> $GITHUB_ENV
+          echo "$error_path"
+          echo "$error_message"
   post_on_discord:
     if: ${{ always() }}
     needs: [simple_deployment_pipeline]
@@ -35,9 +39,7 @@ jobs:
     steps:
       - name: echo error message
         run: |
-          error_path=$(curl https://api.github.com/repos/thomastoumasu/full-stack-open-pokedex/check-runs/${{ needs.simple_deployment_pipeline.steps.failure.outputs.runid }}/annotations | jq '.[-1].path')
-          error_message=$(curl https://api.github.com/repos/thomastoumasu/full-stack-open-pokedex/check-runs/$runid/annotations | jq '.[-1].message')
-          echo "error path $error_path"
-          echo "error message $error_message"
+          echo "global error path $global_error_path"
+          echo "global error message $global_error_message"
           echo "job error path ${{ needs.simple_deployment_pipeline.steps.failure.outputs.error_path }}"
           echo "job error message ${{ needs.simple_deployment_pipeline.steps.failure.outputs.error_message }}"
