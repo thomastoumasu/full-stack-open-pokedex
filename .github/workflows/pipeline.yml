@@ -25,11 +25,11 @@ jobs:
         run: npm ci
       - name: Check style
         run: npm run eslint
-      - name: Always print out steps
-        if: ${{ always() }}
+      - name: Test Failure
+        if: ${{ failure() }}
         env:
-          STEPS: ${{ toJson(steps) }}
-        run: echo "steps $STEPS"
+          JOBFAILURE: ${{ toJson(job) }}
+        run: echo "job failure $JOBFAILURE"
       # - name: Run frontend tests
       #   run: npm run test
       # - name: Install Playwright Chromium
