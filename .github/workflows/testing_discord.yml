@@ -24,13 +24,15 @@ jobs:
         if: ${{ failure() }}
         id: failure
         run: |
-          annotations=$(curl https://api.github.com/repos/thomastoumasu/full-stack-open-pokedex/check-runs/53849423899/annotations | jq '.[-1] | {path: .path, message: .message}')
+          annotations=$(curl https://api.github.com/repos/thomastoumasu/full-stack-open-pokedex/check-runs/${{ job.check_run_id }}/annotations | jq '.[-1] | {path: .path, message: .message}')
           error_path=$(echo "$annotations" | jq '.path')
           error_message=$(echo "$annotations" | jq '.message')
           echo "error_path=$error_path" >> $GITHUB_OUTPUT
           echo "error_message=$error_message" >> $GITHUB_OUTPUT
           echo "global_error_path=$error_path" >> $GITHUB_ENV
           echo "global_error_message=$error_message" >> $GITHUB_ENV
+          echo "$error_path"
+          echo "$error_message"
   post_on_discord:
     if: ${{ always() }}
     needs: [simple_deployment_pipeline]
@@ -38,7 +40,7 @@ jobs:
     steps:
       - name: echo error message
         run: |
-          echo "global error path ${{ env.global_error_path }}"
-          echo "global error message ${{ env.global_error_message }}"
-          echo "job error path ${{ needs.simple_deployment_pipeline.outputs.error_path }}"
-          echo "job error message ${{ needs.simple_deployment_pipeline.outputs.error_message }}"
+          echo "global error path $global_error_path"
+          echo "global error message $global_error_message"
+          echo "job error path ${{ needs.simple_deployment_pipeline.steps.failure.outputs.error_path }}"
+          echo "job error message ${{ needs.simple_deployment_pipeline.steps.failure.outputs.error_message }}"
