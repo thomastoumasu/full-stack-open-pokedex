@@ -25,6 +25,10 @@ jobs:
         run: npm ci
       - name: Check style
         run: npm run eslint
+      - name: Always print out steps
+        env:
+          STEPS: ${{ toJson(steps) }}
+        run: echo "steps $STEPS"
       # - name: Run frontend tests
       #   run: npm run test
       # - name: Install Playwright Chromium
