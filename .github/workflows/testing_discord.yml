@@ -24,9 +24,8 @@ jobs:
         if: ${{ failure() }}
         id: failure
         run: |
-          annotations=$(curl https://api.github.com/repos/thomastoumasu/full-stack-open-pokedex/check-runs/${{ job.check_run_id }}/annotations | jq '.[-1] | {path: .path, message: .message}')
-          error_path=$(echo "$annotations" | jq '.path')
-          error_message=$(echo "$annotations" | jq '.message')
+          error_path=$(curl https://api.github.com/repos/thomastoumasu/full-stack-open-pokedex/check-runs/${{ job.check_run_id }}/annotations | jq '.[-1].path')
+          error_message=$(curl https://api.github.com/repos/thomastoumasu/full-stack-open-pokedex/check-runs/${{ job.check_run_id }}/annotations | jq '.[-1].message')
           echo "error_path=$error_path" >> $GITHUB_OUTPUT
           echo "error_message=$error_message" >> $GITHUB_OUTPUT
           echo "global_error_path=$error_path" >> $GITHUB_ENV
