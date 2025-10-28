@@ -20,42 +20,79 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: "20"
       - name: Install dependencies
         run: npm ci
       - name: Check style
         run: npm run eslint
-      - name: Run frontend tests
-        run: npm run test
-      - name: Install Playwright Chromium
-        run: npx playwright install --with-deps chromium
-      - name: Build
-        run: npm run build
-      - name: Run Playwright tests
-        run: npx playwright test
-      - uses: actions/upload-artifact@v4
-        if: ${{ !cancelled() }}
-        with:
-          name: playwright-report
-          path: playwright-report/
-          retention-days: 30
-      - name: Trigger deployment
-        if: ${{ env.CONDITION == 'true' }}
-        id: final
-        run: curl https://api.render.com/deploy/srv-${{ secrets.RENDER_SERVICE_ID }}?key=${{ secrets.RENDER_API_KEY }}
-  tag_release:
+      # - name: Run frontend tests
+      #   run: npm run test
+      # - name: Install Playwright Chromium
+      #   run: npx playwright install --with-deps chromium
+      # - name: Build
+      #   run: npm run build
+      # - name: Run Playwright tests
+      #   run: npx playwright test
+      # - uses: actions/upload-artifact@v4
+      #   if: ${{ !cancelled() }}
+      #   with:
+      #     name: playwright-report
+      #     path: playwright-report/
+      #     retention-days: 30
+      # - name: Trigger deployment
+      #   if: ${{ env.CONDITION == 'true' }}
+      #   id: final
+      #   run: curl https://api.render.com/deploy/srv-${{ secrets.RENDER_SERVICE_ID }}?key=${{ secrets.RENDER_API_KEY }}
+  # tag_release:
+  #   needs: [simple_deployment_pipeline]
+  #   runs-on: ubuntu-latest
+  #   permissions:
+  #     contents: write
+  #   steps:
+  #   - uses: actions/checkout@v4
+  #     with:
+  #       fetch-depth: '0'
+  #   - name: Bump version and push tag
+  #     if: ${{ needs.simple_deployment_pipeline.outputs.next_job_can_run == 'true' }}
+  #     uses: anothrNick/github-tag-action@4ed44965e0db8dab2b466a16da04aec3cc312fd8 # full hash for version 1.75.0
+  #     env:
+  #       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  #       DEFAULT_BUMP: patch
+  post_on_discord:
     needs: [simple_deployment_pipeline]
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     steps:
-    - uses: actions/checkout@v4
-      with:
-        fetch-depth: '0'
-    - name: Bump version and push tag
-      if: ${{ needs.simple_deployment_pipeline.outputs.next_job_can_run == 'true' }}
-      uses: anothrNick/github-tag-action@4ed44965e0db8dab2b466a16da04aec3cc312fd8 # full hash for version 1.75.0
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        DEFAULT_BUMP: patch
-
+      - name: Always print out github
+        env:
+          GITHUB: ${{ toJson(github) }}
+        run: echo "github $GITHUB"
+      - name: Always print out env
+        env:
+          ENV: ${{ toJson(env) }}
+        run: echo "env $ENV"
+      - name: Always print out steps
+        env:
+          STEPS: ${{ toJson(steps) }}
+        run: echo "steps $STEPS"
+      - name: Test Success
+        # uses: rjstone/discord-webhook-notify@v2.2.1
+        # if: ${{ needs.simple_deployment_pipeline.outputs.next_job_can_run == 'true' }}
+        # with:
+        #   webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
+        #   severity: info
+        #   details: A new version of Pokedex deployed
+        if: ${{ success() }}
+        env:
+          JOBSUCCESS: ${{ toJson(job) }}
+        run: echo "job success $JOBSUCCESS"
+      - name: Test Failure
+        # uses: rjstone/discord-webhook-notify@v2.2.1
+        # if: ${{ failure() }}
+        # with:
+        #   webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
+        #   severity: error
+        #   details: Build failed
+        if: ${{ failure() }}
+        env:
+          JOBFAILURE: ${{ toJson(job) }}
+        run: echo "job failure $JOBFAILURE"
