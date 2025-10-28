@@ -1,0 +1,38 @@
+name: Testing discord
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize]
+
+jobs:
+  simple_deployment_pipeline:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Install dependencies
+        run: npm ci
+      - name: Check style
+        run: npm run eslint
+      - name: Test Failure
+        if: ${{ failure() }}
+        id: failure
+        run: |
+          annotations=$(curl https://api.github.com/repos/thomastoumasu/full-stack-open-pokedex/check-runs/53849423899/annotations | jq '.[-1] | {path: .path, message: .message}')
+          echo "infos=$annotations" >> $GITHUB_OUTPUT
+          echo "global_infos=$annotations" >> $GITHUB_ENV
+  post_on_discord:
+    if: ${{ always() }}
+    needs: [simple_deployment_pipeline]
+    runs-on: ubuntu-latest
+    steps:
+      - name: echo error message
+        run: |
+          echo "global error ${{ env.global_infos }}"
+          echo "job error ${{ needs.simple_deployment_pipeline.outputs.infos }}"
