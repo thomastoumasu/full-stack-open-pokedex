@@ -37,7 +37,7 @@ jobs:
         id: testfailure
         run: |
           annotations=$(curl https://api.github.com/repos/thomastoumasu/full-stack-open-pokedex/check-runs/${{ job.check_run_id }}/annotations)
-          echo info=annotations >> $GITHUB_OUTPUT
+          echo info=$annotations >> $GITHUB_OUTPUT
         # run: |
         #   {
         #       echo "info=<<EOF"
