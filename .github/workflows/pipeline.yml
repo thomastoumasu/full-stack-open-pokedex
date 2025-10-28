@@ -26,6 +26,7 @@ jobs:
       - name: Check style
         run: npm run eslint
       - name: Always print out steps
+        if: ${{ always() }}
         env:
           STEPS: ${{ toJson(steps) }}
         run: echo "steps $STEPS"
