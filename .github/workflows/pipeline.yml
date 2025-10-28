@@ -15,7 +15,6 @@ jobs:
   simple_deployment_pipeline:
     outputs:
       next_job_can_run: ${{ steps.final.outcome == 'success' }}
-      failure_annotations: ${{ steps.testfailure.outputs.info }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -34,10 +33,13 @@ jobs:
         run: echo "job success $JOBSUCCESS"
       - name: Test Failure
         if: ${{ failure() }}
-        id: testfailure
         run: |
-          annotations=$(curl https://api.github.com/repos/thomastoumasu/full-stack-open-pokedex/check-runs/${{ job.check_run_id }}/annotations)
-          echo info=$annotations >> $GITHUB_OUTPUT
+          some_response=$(curl https://api.github.com/repos/thomastoumasu/full-stack-open-pokedex/check-runs/${{ job.check_run_id }}/annotations)
+          echo response_output=$some_response >> $GITHUB_OUTPUT
+        id: some-request
+      - name: Test Failure 2
+        run: |
+          echo "Response is: ${{ steps.some-request.outputs.response_output }}"
         # run: |
         #   {
         #       echo "info=<<EOF"
@@ -85,8 +87,16 @@ jobs:
     steps:
       - name: get error message
         env:
-          ERRORMESSAGE: ${{ toJson(needs.simple_deployment_pipeline.outputs.failure_annotations) }}
+          ERRORMESSAGE: ${{ toJson(needs.simple_deployment_pipeline.outputs.response_output) }}
         run: echo "error $ERRORMESSAGE"
+      - name: get error message 2
+        run: echo needs.simple_deployment_pipeline.steps.some-request.outputs.response_output
+      - name: get error message 3
+        run: echo needs.simple_deployment_pipeline.some-request.outputs.response_output
+      - name: get error message 21
+        run: echo "${{ toJson(needs.simple_deployment_pipeline.steps.some-request.outputs.response_output) }}"
+      - name: get error message 31
+        run: echo "${{ toJson(needs.simple_deployment_pipeline.some-request.outputs.response_output) }}"
       - name: Test Success
         # uses: rjstone/discord-webhook-notify@v2.2.1
         # if: ${{ needs.simple_deployment_pipeline.outputs.next_job_can_run == 'true' }}
