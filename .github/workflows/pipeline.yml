@@ -13,8 +13,8 @@ on:
 
 jobs:
   simple_deployment_pipeline:
-    outputs:
-      next_job_can_run: ${{ steps.final.outcome == 'success' }}
+    # outputs:
+    #   next_job_can_run: ${{ steps.final.outcome == 'success' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -34,13 +34,20 @@ jobs:
       - name: Test Failure
         if: ${{ failure() }}
         run: |
-          some_response=$(curl https://api.github.com/repos/thomastoumasu/full-stack-open-pokedex/check-runs/${{ job.check_run_id }}/annotations)
-          echo "response_output=$some_response" >> $GITHUB_OUTPUT
-        id: some-request
+          {
+            echo 'JSON_RESPONSE<<EOF'
+            curl https://api.github.com/repos/thomastoumasu/full-stack-open-pokedex/check-runs/${{ job.check_run_id }}/annotations
+            echo EOF
+          } >> "$GITHUB_ENV"
+      #   run: |
+      #     some_response=$(curl https://api.github.com/repos/thomastoumasu/full-stack-open-pokedex/check-runs/${{ job.check_run_id }}/annotations)
+      #     echo "response_output=$some_response" >> $GITHUB_OUTPUT
+      #   id: some-request
       - name: Test Failure 2
         if: ${{ always() }}
-        run: |
-          echo "Response is: ${{ steps.some-request.outputs.response_output }}"
+        env:
+          SOME: ${{ toJson(env) }}
+        run: echo "$SOME"
         # run: |
         #   {
         #       echo "info=<<EOF"
