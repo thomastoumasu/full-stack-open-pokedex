@@ -35,9 +35,10 @@ jobs:
         if: ${{ failure() }}
         run: |
           some_response=$(curl https://api.github.com/repos/thomastoumasu/full-stack-open-pokedex/check-runs/${{ job.check_run_id }}/annotations)
-          echo response_output=$some_response >> $GITHUB_OUTPUT
+          echo "response_output=$some_response" >> $GITHUB_OUTPUT
         id: some-request
       - name: Test Failure 2
+        if: ${{ always() }}
         run: |
           echo "Response is: ${{ steps.some-request.outputs.response_output }}"
         # run: |
