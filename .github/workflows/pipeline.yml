@@ -15,6 +15,7 @@ jobs:
   simple_deployment_pipeline:
     outputs:
       next_job_can_run: ${{ steps.final.outcome == 'success' }}
+      failure_annotations: ${{ steps.testfailure.outputs.info }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -25,11 +26,22 @@ jobs:
         run: npm ci
       - name: Check style
         run: npm run eslint
+      - name: Test Success
+        if: ${{ success() }}
+        id: testsuccess
+        env:
+          JOBSUCCESS: ${{ toJson(job) }}
+        run: echo "job success $JOBSUCCESS"
       - name: Test Failure
         if: ${{ failure() }}
-        env:
-          JOBFAILURE: ${{ toJson(job) }}
-        run: echo "job failure $JOBFAILURE"
+        id: testfailure
+        run: |
+          {
+              echo "info=<<EOF"
+              curl https://api.github.com/repos/thomastoumasu/full-stack-open-pokedex/check-runs/${{ job.check_run_id }}/annotations
+              echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+        # run: echo "job_run_id=job.check_run_id" >> "$GITHUB_OUTPUT"
       # - name: Run frontend tests
       #   run: npm run test
       # - name: Install Playwright Chromium
@@ -68,18 +80,10 @@ jobs:
     needs: [simple_deployment_pipeline]
     runs-on: ubuntu-latest
     steps:
-      - name: Always print out github
+      - name: get error message
         env:
-          GITHUB: ${{ toJson(github) }}
-        run: echo "github $GITHUB"
-      - name: Always print out env
-        env:
-          ENV: ${{ toJson(env) }}
-        run: echo "env $ENV"
-      - name: Always print out steps
-        env:
-          STEPS: ${{ toJson(steps) }}
-        run: echo "steps $STEPS"
+          ERRORMESSAGE: ${{ toJson(needs.simple_deployment_pipeline.outputs.failure_annotations) }}
+        run: echo "error $ERRORMESSAGE"
       - name: Test Success
         # uses: rjstone/discord-webhook-notify@v2.2.1
         # if: ${{ needs.simple_deployment_pipeline.outputs.next_job_can_run == 'true' }}
