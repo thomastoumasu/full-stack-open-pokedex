@@ -32,22 +32,26 @@ jobs:
           JOBSUCCESS: ${{ toJson(job) }}
         run: echo "job success $JOBSUCCESS"
       - name: Test Failure
-        if: ${{ failure() }}
+        # if: ${{ failure() }}
+        # run: |
+        #   {
+        #     echo 'JSON_RESPONSE<<EOF'
+        #     curl https://api.github.com/repos/thomastoumasu/full-stack-open-pokedex/check-runs/${{ job.check_run_id }}/annotations
+        #     echo EOF
+        #   } >> "$GITHUB_ENV"
+        # run: |
+        #   some_response=$(curl https://api.github.com/repos/thomastoumasu/full-stack-open-pokedex/check-runs/${{ job.check_run_id }}/annotations)
+        #   echo "response_output=$some_response" >> $GITHUB_OUTPUT
+        # id: some-request
         run: |
-          {
-            echo 'JSON_RESPONSE<<EOF'
-            curl https://api.github.com/repos/thomastoumasu/full-stack-open-pokedex/check-runs/${{ job.check_run_id }}/annotations
-            echo EOF
-          } >> "$GITHUB_ENV"
-      #   run: |
-      #     some_response=$(curl https://api.github.com/repos/thomastoumasu/full-stack-open-pokedex/check-runs/${{ job.check_run_id }}/annotations)
-      #     echo "response_output=$some_response" >> $GITHUB_OUTPUT
-      #   id: some-request
+          some_response=$(curl -X GET https://api.github.com/repos/thomastoumasu/full-stack-open-pokedex/check-runs/${{ job.check_run_id }}/annotations | python -c "import sys,json; print(json.load(sys.stdin)[-1]['message'])")
+          echo "response_output=$some_response" >> $GITHUB_OUTPUT
+          annotations=$(curl -X GET https://api.github.com/repos/thomastoumasu/full-stack-open-pokedex/check-runs/${{ job.check_run_id }}/annotations | python -c "import sys,json; print(json.load(sys.stdin)[-1]['message'])")
+          echo "anno=$annotations" >> $GITHUB_ENV
+          id: some-request
       - name: Test Failure 2
         if: ${{ always() }}
-        env:
-          SOME: ${{ toJson(env) }}
-        run: echo "$SOME"
+        run: echo "${{ env.anno }}"
         # run: |
         #   {
         #       echo "info=<<EOF"
@@ -98,7 +102,7 @@ jobs:
           ERRORMESSAGE: ${{ toJson(needs.simple_deployment_pipeline.outputs.response_output) }}
         run: echo "error $ERRORMESSAGE"
       - name: get error message 2
-        run: echo needs.simple_deployment_pipeline.steps.some-request.outputs.response_output
+        run: echo "${{ env.anno }}"
       - name: get error message 3
         run: echo needs.simple_deployment_pipeline.some-request.outputs.response_output
       - name: get error message 21
