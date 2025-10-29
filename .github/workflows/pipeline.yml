@@ -82,12 +82,13 @@ jobs:
           echo $discord_description
           echo "discord_description=$discord_description" >> $GITHUB_OUTPUT
       - name: dispatch on discord
-        uses: rjstone/discord-webhook-notify@v2
+        uses: sarisia/actions-status-discord@v1
+        if: always()
         with:
           webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
           username: Custom Bot Username
           avatarUrl: https://domain/images/custom.png
-          text: A new version of Pokedex deployed
+          title: A new version of Pokedex deployed
           severity: info
           color: "#ff00aa"
           description: ${{ steps.generate.outputs.discord_description }}
@@ -116,11 +117,12 @@ jobs:
           echo "discord_description=$discord_description" >> $GITHUB_OUTPUT
       - name: dispatch on discord
         if: ${{ env.RUN_ID != '' }}
-        uses: rjstone/discord-webhook-notify@v2
+        uses: sarisia/actions-status-discord@v1
+        if: always()
         with:
           webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
           username: Custom Bot Username
           avatarUrl: https://domain/images/custom.png
-          text: Build failed
+          title: Build failed
           severity: error
           description: ${{ steps.generate.outputs.discord_description }}
