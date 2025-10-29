@@ -74,8 +74,23 @@ jobs:
       ACTOR: ${{ github.actor }}
       NEW_VERSION: ${{ needs.tag_release.outputs.new_version }}
     steps:
-      - name: dispatch success message
-        run: echo "new version ${{ env.NEW_VERSION }} deployed by ${{ env.ACTOR }}"
+      - name: generate success message
+        id: generate
+        run: |
+          echo "new version ${{ env.NEW_VERSION }} deployed by ${{ env.ACTOR }}"
+          discord_description="new version ${{ env.NEW_VERSION }} deployed by ${{ env.ACTOR }}"
+          echo $discord_description
+          echo "discord_description=$discord_description" >> $GITHUB_OUTPUT
+      - name: dispatch on discord
+        uses: rjstone/discord-webhook-notify@v2
+        with:
+          webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
+          username: Custom Bot Username
+          avatarUrl: https://domain/images/custom.png
+          text: A new version of Pokedex deployed
+          severity: info
+          color: "#ff00aa"
+          description: ${{ steps.generate.outputs.discord_description }}
 
   post_failure_on_discord:
     if: ${{ always() }}
@@ -85,7 +100,8 @@ jobs:
       RUN_ID: ${{ needs.lint_and_test.outputs.run-id }}
       USER_REPO: ${{ github.repository }}
     steps:
-      - name: dispatch failure message
+      - name: generate failure message
+        id: generate
         if: ${{ env.RUN_ID != '' }}
         env:
           FIRST_COMMIT_IN_CASE_OF_PUSH: ${{ toJson(github.event.commits[0].url) }}
@@ -95,3 +111,15 @@ jobs:
           first_error_message=$(echo "$annotations" | jq '.message')
           last_commit_in_case_of_pr=$(curl $(curl $(curl https://api.github.com/repos/${{ env.USER_REPO }}/check-runs/${{ env.RUN_ID }} | jq -r '.pull_requests[0].url') | jq -r '.commits_url') | jq -r '.[-1].url')
           echo "commit $last_commit_in_case_of_pr ${{ env.FIRST_COMMIT_IN_CASE_OF_PUSH }} broke the build: $first_error_message in $first_error_path"
+          discord_description="commit $last_commit_in_case_of_pr ${{ env.FIRST_COMMIT_IN_CASE_OF_PUSH }} broke the build: $first_error_message in $first_error_path"
+          echo "$discord_description"
+          echo "discord_description=$discord_description" >> $GITHUB_OUTPUT
+      - name: dispatch on discord
+        uses: rjstone/discord-webhook-notify@v2
+        with:
+          webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
+          username: Custom Bot Username
+          avatarUrl: https://domain/images/custom.png
+          text: Build failed
+          severity: error
+          description: ${{ steps.generate.outputs.discord_description }}
