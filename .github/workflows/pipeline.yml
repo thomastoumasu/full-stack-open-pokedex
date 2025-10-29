@@ -1,8 +1,5 @@
 name: Deployment pipeline
 
-env:
-  DEPLOY_CONDITION: ${{ github.event_name == 'push' && !contains(join(github.event.commits.*.message), '#skip') }}
-
 on:
   push:
     branches:
@@ -45,7 +42,7 @@ jobs:
         run: echo "RUN_ID=${{ job.check_run_id }}" >> $GITHUB_OUTPUT
 
   deploy:
-    if: ${{ env.DEPLOY_CONDITION == 'true' }}
+    if: ${{ github.event_name == 'push' && !contains(join(github.event.commits.*.message), '#skip') }}
     needs: [lint_and_test]
     runs-on: ubuntu-latest
     steps:
