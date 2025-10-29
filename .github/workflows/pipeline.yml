@@ -83,7 +83,6 @@ jobs:
           echo "discord_description=$discord_description" >> $GITHUB_OUTPUT
       - name: dispatch on discord
         uses: sarisia/actions-status-discord@v1
-        if: always()
         with:
           webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
           username: Custom Bot Username
@@ -118,7 +117,6 @@ jobs:
       - name: dispatch on discord
         if: ${{ env.RUN_ID != '' }}
         uses: sarisia/actions-status-discord@v1
-        if: always()
         with:
           webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
           username: Custom Bot Username
