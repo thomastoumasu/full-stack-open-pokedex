@@ -11,6 +11,7 @@ app.get("/version", (req, res) => {
 });
 
 app.get("/health", (req, res) => {
+  const test = 3;
   res.send("ok"); // health check ensuring that the app deployed (for example in render) is in a functional state.
 });
 
