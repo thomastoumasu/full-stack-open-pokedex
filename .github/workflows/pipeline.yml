@@ -84,7 +84,7 @@ jobs:
       - name: dispatch on discord
         uses: sarisia/actions-status-discord@v1
         with:
-          webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
+          webhook: ${{ secrets.DISCORD_WEBHOOK }}
           username: Custom Bot Username
           avatarUrl: https://domain/images/custom.png
           title: A new version of Pokedex deployed
@@ -118,7 +118,7 @@ jobs:
         if: ${{ env.RUN_ID != '' }}
         uses: sarisia/actions-status-discord@v1
         with:
-          webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
+          webhook: ${{ secrets.DISCORD_WEBHOOK }}
           username: Custom Bot Username
           avatarUrl: https://domain/images/custom.png
           title: Build failed
