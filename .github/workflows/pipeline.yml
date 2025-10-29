@@ -48,9 +48,12 @@ jobs:
     steps:
       - name: Trigger deployment
         run: curl https://api.render.com/deploy/srv-${{ secrets.RENDER_SERVICE_ID }}?key=${{ secrets.RENDER_API_KEY }}
+
   tag_release:
     needs: [deploy]
     runs-on: ubuntu-latest
+    outputs:
+      new_version: ${{ steps.tag.outputs.new_tag }}
     permissions:
       contents: write
     steps:
@@ -58,21 +61,21 @@ jobs:
         with:
           fetch-depth: "0"
       - name: Bump version and push tag
+        id: tag
         uses: anothrNick/github-tag-action@4ed44965e0db8dab2b466a16da04aec3cc312fd8 # full hash for version 1.75.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DEFAULT_BUMP: patch
 
   post_success_on_discord:
-    needs: [deploy]
+    needs: [tag_release]
     runs-on: ubuntu-latest
     env:
-      RUN_ID: ${{ needs.lint_and_test.outputs.run-id }} # redondancy to be sure
       ACTOR: ${{ github.actor }}
+      NEW_VERSION: ${{ needs.tag_release.outputs.new_version }}
     steps:
       - name: dispatch success message
-        if: ${{ env.RUN_ID == '' }}
-        run: echo "a new version deployed by ${{ env.ACTOR }}"
+        run: echo "new version ${{ env.NEW_VERSION }}" deployed by ${{ env.ACTOR }}"
 
   post_failure_on_discord:
     if: ${{ always() }}
@@ -85,9 +88,8 @@ jobs:
       - name: dispatch failure message
         if: ${{ env.RUN_ID != '' }}
         env:
-          FIRST_COMMIT_IN_CASE_OF_PUSH: ${{ github.event.commits[0].url }}
+          FIRST_COMMIT_IN_CASE_OF_PUSH: ${{ toJson(github.event.commits[0].url) }}
         run: |
-          sleep 3s
           annotations=$(curl https://api.github.com/repos/${{ env.USER_REPO }}/check-runs/${{ env.RUN_ID }}/annotations | jq '.[-1] | {path: .path, message: .message}')
           first_error_path=$(echo "$annotations" | jq '.path')
           first_error_message=$(echo "$annotations" | jq '.message')
