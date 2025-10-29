@@ -121,6 +121,7 @@ jobs:
           webhook: ${{ secrets.DISCORD_WEBHOOK }}
           nodetail: true
           username: Github Bot
-          title: Build [failed](${{ steps.generate.outputs.details_url }}).
+          title: Build failed.
+          url: ${{ steps.generate.outputs.details_url }}
           status: Failure
           description: ${{ steps.generate.outputs.discord_description }}
