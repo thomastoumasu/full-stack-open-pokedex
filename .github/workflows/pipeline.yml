@@ -87,7 +87,7 @@ jobs:
           webhook: ${{ secrets.DISCORD_WEBHOOK }}
           nodetail: true
           username: Github Bot
-          title: A new version of Pokedex deployed
+          title: A new version of Pokedex deployed on ${{ secrets.RENDER_URL }}
           status: Success
           description: ${{ steps.generate.outputs.discord_description }}
 
