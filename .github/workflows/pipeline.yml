@@ -85,11 +85,10 @@ jobs:
         uses: sarisia/actions-status-discord@v1
         with:
           webhook: ${{ secrets.DISCORD_WEBHOOK }}
-          username: Custom Bot Username
-          avatarUrl: https://domain/images/custom.png
+          nodetail: true
+          username: Github Bot
           title: A new version of Pokedex deployed
-          severity: info
-          color: "#ff00aa"
+          status: Success
           description: ${{ steps.generate.outputs.discord_description }}
 
   post_failure_on_discord:
@@ -119,8 +118,8 @@ jobs:
         uses: sarisia/actions-status-discord@v1
         with:
           webhook: ${{ secrets.DISCORD_WEBHOOK }}
-          username: Custom Bot Username
-          avatarUrl: https://domain/images/custom.png
+          nodetail: true
+          username: Github Bot
           title: Build failed
-          severity: error
+          status: Failure
           description: ${{ steps.generate.outputs.discord_description }}
