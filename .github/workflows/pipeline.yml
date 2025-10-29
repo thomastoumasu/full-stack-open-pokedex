@@ -85,11 +85,11 @@ jobs:
       - name: dispatch failure message
         if: ${{ env.RUN_ID != '' }}
         env:
-          COMMITS: ${{ toJson(github.event.commits) }}
+          COMMIT: ${{ toJson(github.event.commits[0].url) }}
         run: |
           echo "$COMMITS"
           annotations=$(curl https://api.github.com/repos/${{ env.USER_REPO }}/check-runs/${{ env.RUN_ID }}/annotations | jq '.[-1] | {path: .path, message: .message}')
           first_error_path=$(echo "$annotations" | jq '.path')
           first_error_message=$(echo "$annotations" | jq '.message')
           last_commit_url=$(curl $(curl $(curl https://api.github.com/repos/${{ env.USER_REPO }}/check-runs/${{ env.RUN_ID }} | jq -r '.pull_requests[0].url') | jq -r '.commits_url') | jq -r '.[-1].url')
-          echo "commit $last_commit_url ${{ join(github.event.commits.*.message) }} broke the build: $first_error_message in $first_error_path"
+          echo "commit $last_commit_url ${{ env.COMMIT }} broke the build: $first_error_message in $first_error_path"
