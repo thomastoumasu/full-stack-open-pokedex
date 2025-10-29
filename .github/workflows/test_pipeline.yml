@@ -1,4 +1,4 @@
-name: test pipeline
+name: Test pipeline
 
 env:
   CONDITION: ${{ github.event_name == 'push' && !contains(join(github.event.commits.*.message), '#skip') }}

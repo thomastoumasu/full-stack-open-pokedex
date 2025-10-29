@@ -1,4 +1,4 @@
-name: deployment pipeline
+name: Deployment pipeline
 
 env:
   DEPLOY_CONDITION: ${{ github.event_name == 'push' && !contains(join(github.event.commits.*.message), '#skip') }}
