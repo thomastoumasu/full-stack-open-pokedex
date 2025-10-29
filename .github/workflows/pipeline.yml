@@ -99,11 +99,10 @@ jobs:
     env:
       RUN_ID: ${{ needs.lint_and_test.outputs.run-id }}
       USER_REPO: ${{ github.repository }}
-    if: ${{ env.RUN_ID != '' }}
     steps:
       - name: generate failure message
         id: generate
-        # if: ${{ env.RUN_ID != '' }}
+        if: ${{ env.RUN_ID != '' }}
         env:
           FIRST_COMMIT_IN_CASE_OF_PUSH: ${{ toJson(github.event.commits[0].url) }}
         run: |
@@ -116,6 +115,7 @@ jobs:
           echo "$discord_description"
           echo "discord_description=$discord_description" >> $GITHUB_OUTPUT
       - name: dispatch on discord
+        if: ${{ env.RUN_ID != '' }}
         uses: rjstone/discord-webhook-notify@v2
         with:
           webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
