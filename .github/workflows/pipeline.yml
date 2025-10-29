@@ -87,6 +87,7 @@ jobs:
         env:
           FIRST_COMMIT_IN_CASE_OF_PUSH: ${{ toJson(github.event.commits[0].url) }}
         run: |
+          sleep 3s
           annotations=$(curl https://api.github.com/repos/${{ env.USER_REPO }}/check-runs/${{ env.RUN_ID }}/annotations | jq '.[-1] | {path: .path, message: .message}')
           first_error_path=$(echo "$annotations" | jq '.path')
           first_error_message=$(echo "$annotations" | jq '.message')
