@@ -75,7 +75,7 @@ jobs:
       NEW_VERSION: ${{ needs.tag_release.outputs.new_version }}
     steps:
       - name: dispatch success message
-        run: echo "new version ${{ env.NEW_VERSION }}" deployed by ${{ env.ACTOR }}"
+        run: echo "new version ${{ env.NEW_VERSION }} deployed by ${{ env.ACTOR }}"
 
   post_failure_on_discord:
     if: ${{ always() }}
